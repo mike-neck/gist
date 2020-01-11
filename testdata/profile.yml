@@ -1,0 +1,6 @@
+- profile: default
+  destination_dir: my-gists
+  # GITHUB_ACCESS_TOKEN will be used for the profile "default".
+- profile: privates
+  github_access_token: 5f4e3d2c1b0a
+  # $HOME/gist/privates will be used for the profile "privates".
