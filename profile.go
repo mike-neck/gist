@@ -9,15 +9,18 @@ import (
 	"os"
 )
 
+// ProfileYaml is the Profile data structure.
+// This is raw type of Profile that is not validated.
 type ProfileYaml struct {
 	Name  string `yaml:"profile"`
 	Token string `yaml:"github_access_token,omitempty"`
 	Dir   string `yaml:"destination_dir,omitempty"`
 }
 
-// Profile is validated ProfileYaml
+// Profile is validated ProfileYaml.
 type Profile ProfileYaml
 
+// LoadProfileFromFile loads profiles from a given file.
 func LoadProfileFromFile(file string) ([]Profile, error) {
 	reader, err := os.Open(file)
 	if err != nil {
@@ -30,6 +33,7 @@ func LoadProfileFromFile(file string) ([]Profile, error) {
 	return LoadFromReader(reader)
 }
 
+// LoadFromReader loads profiles from given reader.
 func LoadFromReader(reader io.Reader) ([]Profile, error) {
 	bytes, err := ioutil.ReadAll(reader)
 	if err != nil {
