@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"strings"
@@ -29,14 +30,49 @@ func TestLoadFromReader(t *testing.T) {
 
 var validReader io.Reader = strings.NewReader(`
 - profile: default
-  github_access_token: ""
   destination_dir: my-gists
   # GITHUB_ACCESS_TOKEN will be used for the profile "default".
 - profile: privates
   github_access_token: 5f4e3d2c1b0a
-  destination_dir: ""
   # $HOME/gist/privates will be used for the profile "privates".
 `)
+
+func TestLoadFromReader_that_FailsForNotSlice(t *testing.T) {
+	_, err := LoadFromReader(invalidReader)
+	assert.NotNil(t, err)
+}
+
+var invalidReader io.Reader = strings.NewReader(`
+profile: default
+github_access_token: aa0bb1cc2
+destination_dir: dest
+`)
+
+func TestLoadFromReader_that_FailsForInvalidType(t *testing.T) {
+	_, err := LoadFromReader(invalidFormatReader)
+	assert.NotNil(t, err)
+}
+
+var invalidFormatReader io.Reader = strings.NewReader(`
+- name: default
+  title: my-gists
+  rules:
+    - name: rule1
+      spec: do something
+    - name: rule2
+      spec: do another
+`)
+
+func TestLoadFromReader_that_FailsForEof(t *testing.T) {
+	_, err := LoadFromReader(&ErrReader{})
+	assert.NotNil(t, err)
+}
+
+type ErrReader struct{}
+
+func (*ErrReader) Read(p []byte) (n int, err error) {
+	return 0, errors.New("error")
+}
 
 func TestLoadProfileFromFile(t *testing.T) {
 	profiles, err := LoadProfileFromFile("testdata/profile.yml")
@@ -52,4 +88,9 @@ func TestLoadProfileFromFile(t *testing.T) {
 		Token: "5f4e3d2c1b0a",
 	}
 	assert.Equal(t, []Profile{firstExpected, secondExpected}, profiles)
+}
+
+func TestLoadProfileFromFile_that_FailsForNotExisting(t *testing.T) {
+	_, err := LoadProfileFromFile("testdata/not-existing.yaml")
+	assert.NotNil(t, err)
 }
