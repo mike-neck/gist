@@ -14,7 +14,7 @@ type Profile struct {
 	Dir   string `yaml:"destination_dir,omitempty"`
 }
 
-func LoadProfile(file string) ([]Profile, error) {
+func LoadProfileFromFile(file string) ([]Profile, error) {
 	reader, err := os.Open(file)
 	if err != nil {
 		w := fmt.Errorf("LoadProfile_Open: %w", err)
@@ -23,10 +23,10 @@ func LoadProfile(file string) ([]Profile, error) {
 	defer func() {
 		_ = reader.Close()
 	}()
-	return fromReader(reader)
+	return LoadFromReader(reader)
 }
 
-func fromReader(reader io.Reader) ([]Profile, error) {
+func LoadFromReader(reader io.Reader) ([]Profile, error) {
 	bytes, err := ioutil.ReadAll(reader)
 	if err != nil {
 		w := fmt.Errorf("LoadProfile_Read: %w", err)

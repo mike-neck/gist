@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-func TestFromReader(t *testing.T) {
-	ps, err := fromReader(validReader)
+func TestLoadFromReader(t *testing.T) {
+	ps, err := LoadFromReader(validReader)
 	if err != nil {
 		t.Fail()
 	}
@@ -38,8 +38,8 @@ var validReader io.Reader = strings.NewReader(`
   # $HOME/gist/privates will be used for the profile "privates".
 `)
 
-func TestLoadProfile(t *testing.T) {
-	profiles, err := LoadProfile("testdata/profile.yml")
+func TestLoadProfileFromFile(t *testing.T) {
+	profiles, err := LoadProfileFromFile("testdata/profile.yml")
 	if err != nil {
 		t.Fail()
 	}
