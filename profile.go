@@ -96,9 +96,19 @@ type AppendOrOverrideProfilesCommand struct {
 
 // Run profile command.
 func (command *AppendOrOverrideProfilesCommand) Run(ctx ProfileContext) error {
-	// check current profiles and determine profileCommandExecutor
-	// invoke profileCommandExecutor
-	// write profiles to configuration file
+	executor := command.executor(ctx)
+	profileLists := executor.Invoke(ctx.CurrentProfiles)
+
+	writeCloser, err := ctx.ProfileFile.NewWriter()
+	if err != nil {
+		return fmt.Errorf("AppendOrOverrideProfilesCommand_Run_NewWriter: %w", err)
+	}
+	defer func() { _ = writeCloser.Close() }()
+
+	err = profileLists.saveTo(writeCloser)
+	if err != nil {
+		return fmt.Errorf("AppendOrOverrideProfilesCommand_Run_SaveTo: %w", err)
+	}
 	return nil
 }
 
