@@ -9,9 +9,6 @@ import (
 	"os"
 )
 
-// ProfileFile is the file of profiles to be loaded.
-type ProfileFile string
-
 // LoadProfiles loads profile from ProfileFile
 func (file *ProfileFile) LoadProfiles() ([]Profile, error) {
 	fileName := string(*file)
