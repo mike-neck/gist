@@ -108,14 +108,16 @@ func (command *AppendOrOverrideProfilesCommand) Run(ctx ProfileContext) error {
 ////////
 // profileCommandExecutor
 type profileCommandExecutor interface {
-	Invoke(currentProfiles []Profile) []Profile
+	Invoke(currentProfiles []Profile) profileList
 }
+
+type profileList []Profile
 
 type appendExecutor struct {
 	Profile
 }
 
-func (ae *appendExecutor) Invoke(currentProfiles []Profile) []Profile {
+func (ae *appendExecutor) Invoke(currentProfiles []Profile) profileList {
 	profiles := make([]Profile, len(currentProfiles)+1)
 	profiles[0] = ae.Profile
 	for i, p := range currentProfiles {
@@ -132,7 +134,7 @@ func (oe *overrideExecutor) profileName() ProfileName {
 	return oe.Profile.Name
 }
 
-func (oe *overrideExecutor) Invoke(currentProfiles []Profile) []Profile {
+func (oe *overrideExecutor) Invoke(currentProfiles []Profile) profileList {
 	profiles := make([]Profile, len(currentProfiles))
 	for i, p := range currentProfiles {
 		if p.Name == oe.profileName() {

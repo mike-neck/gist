@@ -137,7 +137,7 @@ func TestProfileCommandExecutor_AppendExecutor(t *testing.T) {
 	executor = &appendExecutor{Profile: profile}
 	var current []Profile
 	profiles := executor.Invoke(current)
-	assert.Equal(t, []Profile{profile}, profiles)
+	assert.Equal(t, profileList{profile}, profiles)
 }
 
 func TestProfileCommandExecutor_AppendExecutor_InsertedAtFirst(t *testing.T) {
@@ -199,5 +199,5 @@ func TestProfileCommandExecutor_OverrideExecutor_KeepingAnotherProfile(t *testin
 	}
 	profiles := executor.Invoke(current)
 	assert.Equal(t, 2, len(profiles))
-	assert.Equal(t, []Profile{profile, another}, profiles)
+	assert.Equal(t, profileList{profile, another}, profiles)
 }
