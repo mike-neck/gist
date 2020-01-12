@@ -126,3 +126,35 @@ func TestLoadProfileFromFile_that_FailsForNotExisting(t *testing.T) {
 	_, err := LoadProfileFromFile("testdata/not-existing.yaml")
 	assert.NotNil(t, err)
 }
+
+func TestProfileCommandExecutor_AppendExecutor(t *testing.T) {
+	var executor profileCommandExecutor
+	profile := Profile{
+		Name:  "default",
+		Token: "aa00bb11cc22",
+		Dir:   "/users/ec2-user/gists/repositories",
+	}
+	executor = &appendExecutor{Profile: profile}
+	var current []Profile
+	profiles := executor.Invoke(current)
+	assert.Equal(t, []Profile{profile}, profiles)
+}
+
+func TestProfileCommandExecutor_AppendExecutor_InsertedAtFirst(t *testing.T) {
+	var executor profileCommandExecutor
+	profile := Profile{
+		Name: "default",
+		Dir:  "/users/ec2-user/gists/repositories",
+	}
+	executor = &appendExecutor{Profile: profile}
+	current := []Profile{
+		{
+			Name:  "privates",
+			Token: "a0b1c2d3e4f5",
+		},
+	}
+	profiles := executor.Invoke(current)
+	assert.Equal(t, 1, len(current))
+	assert.Equal(t, 2, len(profiles))
+	assert.Equal(t, profile, profiles[0])
+}

@@ -102,3 +102,20 @@ func (command *AppendOrOverrideProfilesCommand) Run(ctx ProfileContext) error {
 	// write profiles to configuration file
 	return nil
 }
+
+type profileCommandExecutor interface {
+	Invoke(currentProfiles []Profile) []Profile
+}
+
+type appendExecutor struct {
+	Profile
+}
+
+func (ae *appendExecutor) Invoke(currentProfiles []Profile) []Profile {
+	profiles := make([]Profile, len(currentProfiles)+1)
+	profiles[0] = ae.Profile
+	for i, p := range currentProfiles {
+		profiles[i+1] = p
+	}
+	return profiles
+}
