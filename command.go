@@ -44,6 +44,20 @@ func (context *ProfileContext) Token(profileName ProfileName) (GitHubAccessToken
 	return "", fmt.Errorf("no profile found(name = %s)", profileName)
 }
 
+// Dir returns DestinationDir of given profile.
+func (context *ProfileContext) Dir(profileName ProfileName) (DestinationDir, error) {
+	for _, profile := range context.CurrentProfiles {
+		if profile.Name == profileName {
+			dir := profile.Dir
+			if dir == "" {
+				dir = DestinationDir(fmt.Sprintf("%s/gist/%s", context.EnvValues.UserHome, profileName))
+			}
+			return dir, nil
+		}
+	}
+	return "", fmt.Errorf("no profile found(name = %s)", profileName)
+}
+
 // Command represents command being executed by user.
 type Command interface {
 	Run(ctx *ProfileContext) error
