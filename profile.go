@@ -96,13 +96,17 @@ type AppendOrOverrideProfilesCommand struct {
 
 // Run profile command.
 func (command *AppendOrOverrideProfilesCommand) Run(ctx ProfileContext) error {
-	// check current profiles contains required profile
-	// updates required profile if exists
-	// append profile if not exists
+	// check current profiles and determine profileCommandExecutor
+	// invoke profileCommandExecutor
 	// write profiles to configuration file
 	return nil
 }
 
+////////
+// determine profileCommandExecutor
+
+////////
+// profileCommandExecutor
 type profileCommandExecutor interface {
 	Invoke(currentProfiles []Profile) []Profile
 }
@@ -139,3 +143,6 @@ func (oe *overrideExecutor) Invoke(currentProfiles []Profile) []Profile {
 	}
 	return profiles
 }
+
+////////
+// write profiles
