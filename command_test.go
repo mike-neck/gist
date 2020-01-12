@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
@@ -140,4 +141,50 @@ func TestNewEnvValues(t *testing.T) {
 	envValues := NewEnvValues()
 	assert.Equal(t, expected.GitHubAccessToken, envValues.GitHubAccessToken)
 	assert.NotEmpty(t, envValues.UserHome)
+}
+
+func TestProfileFile_NewWriter(t *testing.T) {
+	profileFile := ProfileFile("build/test/new-file")
+	writer, err := profileFile.NewWriter()
+	assert.Nil(t, err)
+	_ = writer.Close()
+	info, err := os.Stat(string(profileFile))
+	assert.Nil(t, err)
+	assert.False(t, info.IsDir())
+}
+
+func TestProfileFile_NewWriter_SameDirectory(t *testing.T) {
+	profileFile := ProfileFile("build-test")
+	writeCloser, err := profileFile.NewWriter()
+	assert.Nil(t, err, "call of NewWriter")
+	_ = writeCloser.Close()
+	info, err := os.Stat(string(profileFile))
+	assert.Nil(t, err, "call of Stat")
+	assert.False(t, info.IsDir())
+	err = os.Remove(string(profileFile))
+	assert.Nil(t, err, "call of Remove")
+}
+
+func TestProfileFile_NewWriter_ExistingFile(t *testing.T) {
+	prepareExistingFile(t)
+	profileFile := ProfileFile("build/existing/conf.yml")
+	writeCloser, err := profileFile.NewWriter()
+	assert.Nil(t, err)
+	_ = writeCloser.Close()
+}
+
+func prepareExistingFile(t *testing.T) {
+	err := os.MkdirAll("build/existing", 0755)
+	if err != nil {
+		t.Fail()
+	}
+	file, err := os.Create("build/existing/conf.yml")
+	if err != nil {
+		t.Fail()
+	}
+	defer func() { _ = file.Close() }()
+	_, err = file.Write([]byte("- profile: default"))
+	if err != nil {
+		t.Fail()
+	}
 }

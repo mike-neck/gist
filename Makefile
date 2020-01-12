@@ -11,4 +11,9 @@ lint:
 	golint -set_exit_status ./...
 
 .PHONY: verify
-verify: lint test
+verify: clean lint test
+
+.PHONY: clean
+clean:
+	go clean
+	rm -rf build/

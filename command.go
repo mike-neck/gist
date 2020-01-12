@@ -2,11 +2,31 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"strings"
 )
 
 // ProfileFile is the file of profiles to be loaded.
 type ProfileFile string
+
+//NewWriter creates writer of ProfileFile
+func (file *ProfileFile) NewWriter() (io.WriteCloser, error) {
+	path := string(*file)
+	lastIndex := strings.LastIndex(path, "/")
+	if lastIndex > 0 {
+		parent := path[0:lastIndex]
+		err := os.MkdirAll(parent, 0755)
+		if err != nil {
+			return nil, fmt.Errorf("ProfileFile_NewWriter_MkdirAll(%s): %w", parent, err)
+		}
+	}
+	writer, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return nil, fmt.Errorf("ProfileFile_NewWriter_OpenFile: %w", err)
+	}
+	return writer, nil
+}
 
 // ProfileName is name of profile.
 type ProfileName string
