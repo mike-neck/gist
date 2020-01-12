@@ -12,6 +12,24 @@ import (
 // ProfileFile is the file of profiles to be loaded.
 type ProfileFile string
 
+// LoadProfiles loads profile from ProfileFile
+func (file *ProfileFile) LoadProfiles() ([]Profile, error) {
+	fileName := string(*file)
+	fileInfo, err := os.Stat(fileName)
+	if err != nil {
+		return []Profile{}, nil
+	}
+	switch mode := fileInfo.Mode(); {
+	case mode.IsDir():
+		return nil, fmt.Errorf("%s is directory", fileName)
+	}
+	profiles, err := LoadProfileFromFile(fileName)
+	if err != nil {
+		return nil, err
+	}
+	return profiles, nil
+}
+
 // DefaultProfileFile returns default profile file.
 func DefaultProfileFile() ProfileFile {
 	home := os.Getenv("HOME")

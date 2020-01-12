@@ -14,6 +14,32 @@ func TestDefaultProfileFile(t *testing.T) {
 	assert.True(t, strings.HasSuffix(string(profileFile), ".gist.yml"))
 }
 
+func TestProfileFile_LoadProfiles(t *testing.T) {
+	profileFile := ProfileFile("testdata/profile.yml")
+	var profiles []Profile
+	profiles, err := profileFile.LoadProfiles()
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(profiles))
+	profileNames := make([]string, 2)
+	for i, p := range profiles {
+		profileNames[i] = p.Name
+	}
+	assert.Equal(t, []string{"default", "privates"}, profileNames)
+}
+
+func TestProfileFile_LoadProfiles_on_FileNotFound(t *testing.T) {
+	profileFile := ProfileFile("testdata/not-exist.yml")
+	profiles, err := profileFile.LoadProfiles()
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(profiles))
+}
+
+func TestProfileFile_LoadProfiles_that_FailsForLoadingDirectory(t *testing.T) {
+	profileFile := ProfileFile("testdata")
+	_, err := profileFile.LoadProfiles()
+	assert.NotNil(t, err)
+}
+
 func TestLoadFromReader(t *testing.T) {
 	ps, err := LoadFromReader(validReader)
 	if err != nil {
