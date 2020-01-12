@@ -30,6 +30,9 @@ type EnvValues struct {
 func NewEnvValues() EnvValues {
 	githubAccessToken := os.Getenv("GITHUB_ACCESS_TOKEN")
 	userHome := os.Getenv("HOME")
+	if userHome == "" {
+		userHome = os.Getenv("HOMEPATH")
+	}
 	return EnvValues{
 		GitHubAccessToken: GitHubAccessToken(githubAccessToken),
 		UserHome:          UserHome(userHome),
