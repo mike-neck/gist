@@ -17,3 +17,7 @@ verify: clean lint test
 clean:
 	go clean
 	rm -rf build/
+
+.PHONY: fmt
+fmt:
+	go fmt
