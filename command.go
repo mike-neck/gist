@@ -73,5 +73,6 @@ func (context *ProfileContext) Dir(profileName ProfileName) (DestinationDir, err
 
 // Command represents command being executed by user.
 type Command interface {
+	// Run executes each command.
 	Run(ctx *ProfileContext) error
 }

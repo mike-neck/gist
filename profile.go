@@ -93,3 +93,12 @@ type AppendOrOverrideProfilesCommand struct {
 	GitHubAccessToken
 	DestinationDir
 }
+
+// Run profile command.
+func (command *AppendOrOverrideProfilesCommand) Run(ctx ProfileContext) error {
+	// check current profiles contains required profile
+	// updates required profile if exists
+	// append profile if not exists
+	// write profiles to configuration file
+	return nil
+}
