@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 // ProfileFile is the file of profiles to be loaded.
 type ProfileFile string
@@ -21,6 +24,16 @@ type UserHome string
 type EnvValues struct {
 	GitHubAccessToken
 	UserHome
+}
+
+// NewEnvValues loads from environmental variables.
+func NewEnvValues() EnvValues {
+	githubAccessToken := os.Getenv("GITHUB_ACCESS_TOKEN")
+	userHome := os.Getenv("HOME")
+	return EnvValues{
+		GitHubAccessToken: GitHubAccessToken(githubAccessToken),
+		UserHome:          UserHome(userHome),
+	}
 }
 
 // ProfileContext is Profiles and ProfileFile which the command will be executed on.

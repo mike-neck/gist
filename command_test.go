@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -129,4 +130,14 @@ func TestProfileContext_Dir_From_Env(t *testing.T) {
 	destinationDir, err := context.Dir(profileName)
 	assert.Nil(t, err)
 	assert.Equal(t, DestinationDir("/users/ec2-user/gist/privates"), destinationDir)
+}
+
+func TestNewEnvValues(t *testing.T) {
+	_ = godotenv.Load("testdata/test.env")
+	expected := EnvValues{
+		GitHubAccessToken: "aa00bb11cc22",
+	}
+	envValues := NewEnvValues()
+	assert.Equal(t, expected.GitHubAccessToken, envValues.GitHubAccessToken)
+	assert.NotEmpty(t, envValues.UserHome)
 }
