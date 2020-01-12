@@ -8,6 +8,12 @@ import (
 	"testing"
 )
 
+func TestDefaultProfileFile(t *testing.T) {
+	profileFile := DefaultProfileFile()
+	assert.True(t, len(string(profileFile)) > 0)
+	assert.True(t, strings.HasSuffix(string(profileFile), ".gist.yml"))
+}
+
 func TestLoadFromReader(t *testing.T) {
 	ps, err := LoadFromReader(validReader)
 	if err != nil {

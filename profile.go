@@ -9,6 +9,16 @@ import (
 	"os"
 )
 
+// ProfileFile is the file of profiles to be loaded.
+type ProfileFile string
+
+// DefaultProfileFile returns default profile file.
+func DefaultProfileFile() ProfileFile {
+	home := os.Getenv("HOME")
+	file := fmt.Sprintf("%s/.gist.yml", home)
+	return ProfileFile(file)
+}
+
 // ProfileYaml is the Profile data structure.
 // This is raw type of Profile that is not validated.
 type ProfileYaml struct {
