@@ -249,3 +249,52 @@ type ErrorWriter struct {
 func (*ErrorWriter) Write(p []byte) (n int, err error) {
 	return 0, errors.New("test writer error")
 }
+
+func TestAppendOrOverrideProfilesCommand_Executor_OverrideExecutor(t *testing.T) {
+	command := AppendOrOverrideProfilesCommand{
+		ProfileName:       "default",
+		GitHubAccessToken: "",
+		DestinationDir:    "",
+	}
+	context := ProfileContext{
+		EnvValues:   EnvValues{},
+		ProfileFile: "/users/ec2-user/.gist.yml",
+		CurrentProfiles: []Profile{
+			{
+				Name: "default",
+				Dir:  "/users/ec2-user/gist/default",
+			},
+		},
+	}
+	var executor profileCommandExecutor
+	executor = command.executor(context)
+	e, ok := executor.(*overrideExecutor)
+	assert.True(t, ok)
+	assert.Equal(t, ProfileName("default"), e.Name)
+	assert.Equal(t, GitHubAccessToken(""), e.Token)
+	assert.Equal(t, DestinationDir(""), e.Dir)
+}
+
+func TestAppendOrOverrideProfilesCommand_Executor_AppendExecutor(t *testing.T) {
+	command := AppendOrOverrideProfilesCommand{
+		ProfileName:       "privates",
+		GitHubAccessToken: "",
+		DestinationDir:    "",
+	}
+	context := ProfileContext{
+		EnvValues:   EnvValues{},
+		ProfileFile: "/users/ec2-user/.gist.yml",
+		CurrentProfiles: []Profile{
+			{
+				Name: "default",
+				Dir:  "/users/ec2-user/gist/default",
+			},
+		},
+	}
+	executor := command.executor(context)
+	e, ok := executor.(*appendExecutor)
+	assert.True(t, ok)
+	assert.Equal(t, ProfileName("privates"), e.Name)
+	assert.Equal(t, GitHubAccessToken(""), e.Token)
+	assert.Equal(t, DestinationDir(""), e.Dir)
+}

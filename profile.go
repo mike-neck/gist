@@ -104,6 +104,24 @@ func (command *AppendOrOverrideProfilesCommand) Run(ctx ProfileContext) error {
 
 ////////
 // determine profileCommandExecutor
+func (command *AppendOrOverrideProfilesCommand) executor(ctx ProfileContext) profileCommandExecutor {
+	profileName := command.ProfileName
+	for _, p := range ctx.CurrentProfiles {
+		if p.Name == profileName {
+			executor := overrideExecutor{Profile{
+				Name:  profileName,
+				Token: command.GitHubAccessToken,
+				Dir:   command.DestinationDir,
+			}}
+			return &executor
+		}
+	}
+	return &appendExecutor{Profile{
+		Name:  profileName,
+		Token: command.GitHubAccessToken,
+		Dir:   command.DestinationDir,
+	}}
+}
 
 ////////
 // profileCommandExecutor
