@@ -158,3 +158,46 @@ func TestProfileCommandExecutor_AppendExecutor_InsertedAtFirst(t *testing.T) {
 	assert.Equal(t, 2, len(profiles))
 	assert.Equal(t, profile, profiles[0])
 }
+
+func TestProfileCommandExecutor_OverrideExecutor(t *testing.T) {
+	var executor profileCommandExecutor
+	profile := Profile{
+		Name: "default",
+		Dir:  "/users/ec2-user/gists/repositories",
+	}
+	executor = &overrideExecutor{Profile: profile}
+	current := []Profile{
+		{
+			Name:  "default",
+			Token: "aa00bb11cc22",
+			Dir:   "/users/ec2-user/destination",
+		},
+	}
+	profiles := executor.Invoke(current)
+	assert.Equal(t, 1, len(profiles))
+	assert.Equal(t, profile, profiles[0])
+}
+
+func TestProfileCommandExecutor_OverrideExecutor_KeepingAnotherProfile(t *testing.T) {
+	var executor profileCommandExecutor
+	profile := Profile{
+		Name: "default",
+		Dir:  "/users/ec2-user/gists/repositories",
+	}
+	executor = &overrideExecutor{Profile: profile}
+	another := Profile{
+		Name:  "privates",
+		Token: "000ccc111",
+	}
+	current := []Profile{
+		{
+			Name:  "default",
+			Token: "aa00bb11cc22",
+			Dir:   "/users/ec2-user/destination",
+		},
+		another,
+	}
+	profiles := executor.Invoke(current)
+	assert.Equal(t, 2, len(profiles))
+	assert.Equal(t, []Profile{profile, another}, profiles)
+}

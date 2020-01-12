@@ -119,3 +119,23 @@ func (ae *appendExecutor) Invoke(currentProfiles []Profile) []Profile {
 	}
 	return profiles
 }
+
+type overrideExecutor struct {
+	Profile
+}
+
+func (oe *overrideExecutor) profileName() ProfileName {
+	return oe.Profile.Name
+}
+
+func (oe *overrideExecutor) Invoke(currentProfiles []Profile) []Profile {
+	profiles := make([]Profile, len(currentProfiles))
+	for i, p := range currentProfiles {
+		if p.Name == oe.profileName() {
+			profiles[i] = oe.Profile
+		} else {
+			profiles[i] = p
+		}
+	}
+	return profiles
+}
