@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"github.com/stretchr/testify/assert"
 	"io"
@@ -200,4 +201,51 @@ func TestProfileCommandExecutor_OverrideExecutor_KeepingAnotherProfile(t *testin
 	profiles := executor.Invoke(current)
 	assert.Equal(t, 2, len(profiles))
 	assert.Equal(t, profileList{profile, another}, profiles)
+}
+
+func TestProfileList_WriteTo(t *testing.T) {
+	profiles := profileList{
+		{
+			Name:  "default",
+			Token: "00ff11ee22dd",
+		},
+		{
+			Name: "privates",
+			Dir:  "/users/ec2-user/items",
+		},
+	}
+	var writer io.Writer
+	buffer := new(bytes.Buffer)
+	writer = buffer
+	err := profiles.saveTo(writer)
+	assert.Nil(t, err)
+	expected := []byte(`- profile: default
+  github_access_token: 00ff11ee22dd
+- profile: privates
+  destination_dir: /users/ec2-user/items
+`)
+	assert.Equal(t, expected, buffer.Bytes())
+}
+
+func TestProfileList_WriteTo_that_FailsForErrorWriter(t *testing.T) {
+	profiles := profileList{
+		{
+			Name:  "default",
+			Token: "00ff11ee22dd",
+		},
+		{
+			Name: "privates",
+			Dir:  "/users/ec2-user/items",
+		},
+	}
+	writer := &ErrorWriter{}
+	err := profiles.saveTo(writer)
+	assert.NotNil(t, err)
+}
+
+type ErrorWriter struct {
+}
+
+func (*ErrorWriter) Write(p []byte) (n int, err error) {
+	return 0, errors.New("test writer error")
 }

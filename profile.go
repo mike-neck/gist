@@ -148,3 +148,14 @@ func (oe *overrideExecutor) Invoke(currentProfiles []Profile) profileList {
 
 ////////
 // write profiles
+func (pl *profileList) saveTo(writer io.Writer) error {
+	bytes, err := yaml.Marshal(*pl)
+	if err != nil {
+		return fmt.Errorf("profileList_SaveTo_Marshal: %w", err)
+	}
+	_, err = writer.Write(bytes)
+	if err != nil {
+		return fmt.Errorf("profileList_SaveTo_Write: %w", err)
+	}
+	return nil
+}
