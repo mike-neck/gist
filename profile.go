@@ -40,9 +40,9 @@ func DefaultProfileFile() ProfileFile {
 // ProfileYaml is the Profile data structure.
 // This is raw type of Profile that is not validated.
 type ProfileYaml struct {
-	Name  string `yaml:"profile"`
-	Token string `yaml:"github_access_token,omitempty"`
-	Dir   string `yaml:"destination_dir,omitempty"`
+	Name  ProfileName       `yaml:"profile"`
+	Token GitHubAccessToken `yaml:"github_access_token,omitempty"`
+	Dir   DestinationDir    `yaml:"destination_dir,omitempty"`
 }
 
 // Profile is validated ProfileYaml.
@@ -86,4 +86,13 @@ func LoadFromReader(reader io.Reader) ([]Profile, error) {
 	}
 
 	return profiles, nil
+}
+
+//////////////
+
+// AppendOrOverrideProfilesCommand represents command profile
+type AppendOrOverrideProfilesCommand struct {
+	ProfileName
+	GitHubAccessToken
+	DestinationDir
 }

@@ -20,11 +20,11 @@ func TestProfileFile_LoadProfiles(t *testing.T) {
 	profiles, err := profileFile.LoadProfiles()
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(profiles))
-	profileNames := make([]string, 2)
+	profileNames := make([]ProfileName, 2)
 	for i, p := range profiles {
 		profileNames[i] = p.Name
 	}
-	assert.Equal(t, []string{"default", "privates"}, profileNames)
+	assert.Equal(t, []ProfileName{"default", "privates"}, profileNames)
 }
 
 func TestProfileFile_LoadProfiles_on_FileNotFound(t *testing.T) {
