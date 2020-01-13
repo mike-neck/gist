@@ -6,11 +6,23 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 )
 
 // GistID is an id of a gist.
 type GistID string
+
+var idPattern = regexp.MustCompile("^[0-9a-f]+$")
+
+// NewGistID validates id and creates GistID.
+func NewGistID(id string) (*GistID, error) {
+	if !idPattern.MatchString(id) {
+		return nil, errors.New("invalid gist-id: pattern is '^[0-9a-f]$'")
+	}
+	gistID := GistID(id)
+	return &gistID, nil
+}
 
 // PreferSSH determines protocol (https/ssh).
 type PreferSSH int
@@ -169,6 +181,3 @@ func (cc *CloneCommand) Clone(directory string) error {
 	}
 	return nil
 }
-
-//git@gist.github.com:0674f0f942295225275c349abbe06675.git
-//https://gist.github.com/0674f0f942295225275c349abbe06675.git

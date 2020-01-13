@@ -130,8 +130,12 @@ func cloneCommand(envValues *EnvValues, fileFlag *string) *cli.Command {
 			if gistID == "" {
 				return errors.New("gist id is required")
 			}
+			id, err := NewGistID(gistID)
+			if err != nil {
+				return fmt.Errorf("CloneCommand_NewGistID: %w", err)
+			}
 			command := CloneCommand{
-				GistID:         GistID(gistID),
+				GistID:         *id,
 				ProfileName:    ProfileName(profileName),
 				PreferSSH:      PreferSSHFromBool(preferSSH),
 				RepositoryName: RepositoryName(repoName),

@@ -112,3 +112,22 @@ func indexOf(item string, items []string) int {
 	}
 	return -1
 }
+
+func TestNewGistID_Success(t *testing.T) {
+	var gistID *GistID
+	gistID, err := NewGistID("12a34b56c78d90ef")
+	assert.Nil(t, err)
+	assert.Equal(t, GistID("12a34b56c78d90ef"), *gistID)
+}
+
+func TestNewGistID_InvalidID(t *testing.T) {
+	gistID, err := NewGistID("12a34b56c78d90efg")
+	assert.NotNil(t, err)
+	assert.Nil(t, gistID)
+}
+
+func TestNewGistID_InvalidID2(t *testing.T) {
+	gistID, err := NewGistID("1a2c-9b8e")
+	assert.NotNil(t, err)
+	assert.Nil(t, gistID)
+}
