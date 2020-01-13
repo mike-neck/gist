@@ -32,6 +32,17 @@ func (s *PreferSSH) String() string {
 	panic(fmt.Sprintf("unknown ssh value: %d", s))
 }
 
+// BaseURL is gist base url
+func (s *PreferSSH) BaseURL() string {
+	switch *s {
+	case https:
+		return "https://gist.github.com/"
+	case ssh:
+		return "git@gist.github.com:"
+	}
+	panic(fmt.Sprintf("unknown ssh value: %d", s))
+}
+
 // RepositoryName is name for gist directory.
 type RepositoryName string
 
@@ -43,6 +54,14 @@ type CloneCommand struct {
 	RepositoryName
 }
 
+// DirName is directory name for clone command.
+func (cc *CloneCommand) DirName() string {
+	if cc.RepositoryName == "" {
+		return string(cc.GistID)
+	}
+	return string(cc.RepositoryName)
+}
+
 // Run command of CloneCommand
 func (cc *CloneCommand) Run(ctx ProfileContext) error {
 	// determine destination dir
@@ -50,13 +69,22 @@ func (cc *CloneCommand) Run(ctx ProfileContext) error {
 	if err != nil {
 		return fmt.Errorf("CloneCommand_Run_ProfileContext_Dir: %w", err)
 	}
-	fmt.Println(destinationDir)
 	// resolve destination dir
+	targetDirectory, err := destinationDir.Resolve(cc.DirName())
+	if err != nil {
+		return fmt.Errorf("CloneCommand_Run_Resolve: %w", err)
+	}
+	fmt.Println(targetDirectory)
 	// determine url
 	// execute git clone
 	// get info on gist
 	// write info into repository file under destination dir
 	return nil
+}
+
+// URL is gist git url
+func (cc *CloneCommand) URL() string {
+	return fmt.Sprintf("%s%s.git", cc.BaseURL(), cc.GistID)
 }
 
 //git@gist.github.com:0674f0f942295225275c349abbe06675.git

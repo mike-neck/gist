@@ -49,3 +49,39 @@ func GitCloneExample(t *testing.T) {
 		assert.Fail(t, "failed to show branches: %s", err.Error())
 	}
 }
+
+func TestCloneCommand_URL_HTTPS1(t *testing.T) {
+	command := CloneCommand{
+		GistID:         "11aa22bb33cc",
+		ProfileName:    "default",
+		PreferSSH:      https,
+		RepositoryName: "",
+	}
+	var url string
+	url = command.URL()
+	assert.Equal(t, "https://gist.github.com/11aa22bb33cc.git", url)
+}
+
+func TestCloneCommand_URL_HTTPS2(t *testing.T) {
+	command := CloneCommand{
+		GistID:         "10a29b38c",
+		ProfileName:    "default",
+		PreferSSH:      https,
+		RepositoryName: "",
+	}
+	var url string
+	url = command.URL()
+	assert.Equal(t, "https://gist.github.com/10a29b38c.git", url)
+}
+
+func TestCloneCommand_URL_SSH(t *testing.T) {
+	command := CloneCommand{
+		GistID:         "11aa22bb33cc",
+		ProfileName:    "default",
+		PreferSSH:      ssh,
+		RepositoryName: "",
+	}
+	var url string
+	url = command.URL()
+	assert.Equal(t, "git@gist.github.com:11aa22bb33cc.git", url)
+}
