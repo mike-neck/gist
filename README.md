@@ -53,11 +53,12 @@ Clone gist
     * An id of gist
     * `profile` - Profile to use.(Default: `default`)
     * `user` - A user name of gist.
+    * `ssh` - Prefer ssh(Default: `false` = `https`)
 
 #### Example
 
 ```bash
-gist clone 0a1b2c3d4e5f
+gist clone 0a1b2c3d4e5f -ssh
 ```
 
 Profile

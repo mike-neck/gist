@@ -6,6 +6,22 @@ type GistID string
 // UserName is owner of gist.
 type UserName string
 
+// PreferSSH determines protocol (https/ssh).
+type PreferSSH int
+
+const (
+	https PreferSSH = iota
+	ssh
+)
+
+// PreferSSHFromBool converts bool to PreferSSH
+func PreferSSHFromBool(sshFlag bool) PreferSSH {
+	if sshFlag {
+		return ssh
+	}
+	return https
+}
+
 // CloneCommand clones gist repository
 type CloneCommand struct {
 	GistID
@@ -17,3 +33,6 @@ type CloneCommand struct {
 func (cc *CloneCommand) Run(ctx ProfileContext) error {
 	return nil
 }
+
+//git@gist.github.com:0674f0f942295225275c349abbe06675.git
+//https://gist.github.com/0674f0f942295225275c349abbe06675.git
