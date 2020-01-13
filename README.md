@@ -53,6 +53,7 @@ Clone gist
     * An id of gist
     * `profile` - Profile to use.(Default: `default`)
     * `ssh` - Prefer ssh(Default: `false` = `https`)
+    * `name` - Gist name, if given directory name becomes this.(Default: empty string, thus id will be used)
 
 #### Example
 

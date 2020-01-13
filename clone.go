@@ -19,14 +19,25 @@ func PreferSSHFromBool(sshFlag bool) PreferSSH {
 	return https
 }
 
+// RepositoryName is name for gist directory.
+type RepositoryName string
+
 // CloneCommand clones gist repository
 type CloneCommand struct {
 	GistID
 	ProfileName
+	PreferSSH
+	RepositoryName
 }
 
 // Run command of CloneCommand
 func (cc *CloneCommand) Run(ctx ProfileContext) error {
+	// determine destination dir
+	// resolve destination dir
+	// determine url
+	// execute git clone
+	// get info on gist
+	// write info into repository file under destination dir
 	return nil
 }
 
