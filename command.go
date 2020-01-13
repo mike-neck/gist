@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -41,6 +42,23 @@ type GitHubAccessToken string
 
 // DestinationDir is destination directory where to clone gist repositories.
 type DestinationDir string
+
+// Resolve returns sub path.
+func (dir *DestinationDir) Resolve(subPath string) (string, error) {
+	if len(subPath) == 0 {
+		return "", errors.New("subPath should be non empty string")
+	}
+	parent := string(*dir)
+	if strings.HasSuffix(parent, "/") {
+		lastIndex := strings.LastIndex(parent, "/")
+		parent = parent[:lastIndex]
+	}
+	path := subPath
+	if strings.HasPrefix(path, "/") {
+		path = path[1:]
+	}
+	return fmt.Sprintf("%s/%s", parent, path), nil
+}
 
 // UserHome is home path.
 type UserHome string

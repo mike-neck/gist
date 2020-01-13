@@ -260,3 +260,31 @@ func TestEnvValues_NewContext_FileIsDirectory(t *testing.T) {
 	_, err := envValues.NewContext("testdata")
 	assert.NotNil(t, err)
 }
+
+func TestDestinationDir_Resolve(t *testing.T) {
+	destinationDir := DestinationDir("build")
+	var dir string
+	dir, err := destinationDir.Resolve("sub")
+	assert.Nil(t, err)
+	assert.Equal(t, "build/sub", dir)
+}
+
+func TestDestinationDir_Resolve_WithSuffixSlush(t *testing.T) {
+	destinationDir := DestinationDir("build/")
+	dir, err := destinationDir.Resolve("sub")
+	assert.Nil(t, err)
+	assert.Equal(t, "build/sub", dir)
+}
+
+func TestDestinationDir_Resolve_WithPrefixOnParam(t *testing.T) {
+	destinationDir := DestinationDir("build")
+	dir, err := destinationDir.Resolve("/sub")
+	assert.Nil(t, err)
+	assert.Equal(t, "build/sub", dir)
+}
+
+func TestDestinationDir_Resolve_ParamEmpty(t *testing.T) {
+	destinationDir := DestinationDir("build")
+	_, err := destinationDir.Resolve("")
+	assert.NotNil(t, err)
+}

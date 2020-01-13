@@ -18,7 +18,7 @@ func TestPreferSSHFromBool(t *testing.T) {
 }
 
 // example of go-git
-func TestGitCloneExample(t *testing.T) {
+func GitCloneExample(t *testing.T) {
 	tempDir, err := ioutil.TempDir("", "clone-example")
 	if err != nil {
 		assert.Fail(t, "failed to get temp dir: %s", err.Error())
