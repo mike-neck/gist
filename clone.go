@@ -1,6 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"io"
+	"os"
+	"strings"
+)
 
 // GistID is an id of a gist.
 type GistID string
@@ -75,11 +81,65 @@ func (cc *CloneCommand) Run(ctx ProfileContext) error {
 		return fmt.Errorf("CloneCommand_Run_Resolve: %w", err)
 	}
 	fmt.Println(targetDirectory)
+	// test directory is empty or not existing
+	result, err := testDestinationDir(targetDirectory)
+	if err != nil {
+		return fmt.Errorf("CloneCommand_Run_TestDir: %w", err)
+	}
+	if result != resultEmptyDir && result != resultNotExistingDir {
+		return fmt.Errorf("CloneCommand_Run_TestDir: %s is not empty directory", targetDirectory)
+	} else if result == resultNotExistingDir {
+		err := createParentDirectory(targetDirectory)
+		if err != nil {
+			return fmt.Errorf("CloneCommand_Run_CreateParentDir(%s): %w", targetDirectory, err)
+		}
+	}
 	// determine url
+	url := cc.URL()
+	fmt.Println(url)
 	// execute git clone
 	// get info on gist
 	// write info into repository file under destination dir
 	return nil
+}
+
+type testDirResult int
+
+const (
+	resultNotExistingDir testDirResult = iota
+	resultEmptyDir
+	resultHasContentsDir
+	resultError
+)
+
+func testDestinationDir(directory string) (testDirResult, error) {
+	file, err := os.Open(directory)
+	if err != nil {
+		if _, ok := err.(*os.PathError); ok {
+			return resultNotExistingDir, nil
+		}
+		return resultError, err
+	}
+	defer func() { _ = file.Close() }()
+	_, err = file.Readdirnames(1)
+	if errors.Is(err, io.EOF) {
+		return resultEmptyDir, nil
+	}
+	if err != nil {
+		return resultError, err
+	}
+	return resultHasContentsDir, nil
+}
+
+func createParentDirectory(directory string) error {
+	index := strings.LastIndex(directory, "/")
+	if index < 0 {
+		return nil
+	} else if index == 0 {
+		return os.Mkdir(directory, 0755)
+	}
+	dir := directory[:index]
+	return os.MkdirAll(dir, 0755)
 }
 
 // URL is gist git url
