@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/urfave/cli/v2"
 )
@@ -13,6 +14,7 @@ func GetApplication(args []string) Application {
 		Flags: configFile(envValues, &fileFlag),
 		Commands: []*cli.Command{
 			profileCommand(&envValues, &fileFlag),
+			cloneCommand(&envValues, &fileFlag),
 		},
 	}
 	return &CliApp{
@@ -107,5 +109,60 @@ func destinationDirectoryFlag(dir *string) *cli.StringFlag {
 		Required:    false,
 		Value:       "",
 		Destination: dir,
+	}
+}
+
+func cloneCommand(envValues *EnvValues, fileFlag *string) *cli.Command {
+	var profileName string
+	var preferSSH bool
+	var repoName string
+	return &cli.Command{
+		Name:    "clone",
+		Aliases: []string{"c"},
+		Usage:   "clones specified gist",
+		Flags: []cli.Flag{
+			profileFlag(&profileName),
+			preferSSHFlag(&preferSSH),
+			repositoryName(&repoName),
+		},
+		Action: func(context *cli.Context) error {
+			gistID := context.Args().First()
+			if gistID == "" {
+				return errors.New("gist id is required")
+			}
+			command := CloneCommand{
+				GistID:         GistID(gistID),
+				ProfileName:    ProfileName(profileName),
+				PreferSSH:      PreferSSHFromBool(preferSSH),
+				RepositoryName: RepositoryName(repoName),
+			}
+			ctx, err := envValues.NewContext(ProfileFile(*fileFlag))
+			if err != nil {
+				return fmt.Errorf("CloneCommand_NewContext: %w", err)
+			}
+			return command.Run(ctx)
+		},
+	}
+}
+
+func preferSSHFlag(preferSSH *bool) cli.Flag {
+	return &cli.BoolFlag{
+		Name:        "ssh",
+		Aliases:     []string{"s"},
+		Usage:       "prefer ssh. if set clones via ssh, if not set clones via https.",
+		Required:    false,
+		Value:       false,
+		Destination: preferSSH,
+	}
+}
+
+func repositoryName(repoName *string) cli.Flag {
+	return &cli.StringFlag{
+		Name:        "name",
+		Aliases:     []string{"n"},
+		Usage:       "name for gist. if given, it is used as directory name",
+		Required:    false,
+		Value:       "",
+		Destination: repoName,
 	}
 }

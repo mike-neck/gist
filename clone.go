@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 // GistID is an id of a gist.
 type GistID string
 
@@ -19,6 +21,17 @@ func PreferSSHFromBool(sshFlag bool) PreferSSH {
 	return https
 }
 
+// String for PreferSSH
+func (s *PreferSSH) String() string {
+	switch *s {
+	case https:
+		return "https"
+	case ssh:
+		return "ssh"
+	}
+	panic(fmt.Sprintf("unknown ssh value: %d", s))
+}
+
 // RepositoryName is name for gist directory.
 type RepositoryName string
 
@@ -33,6 +46,11 @@ type CloneCommand struct {
 // Run command of CloneCommand
 func (cc *CloneCommand) Run(ctx ProfileContext) error {
 	// determine destination dir
+	destinationDir, err := ctx.Dir(cc.ProfileName)
+	if err != nil {
+		return fmt.Errorf("CloneCommand_Run_ProfileContext_Dir: %w", err)
+	}
+	fmt.Println(destinationDir)
 	// resolve destination dir
 	// determine url
 	// execute git clone
