@@ -4,3 +4,4 @@ memo/
 .DS_Store/
 example/
 .token/
+testdata/github-actions-env.env
