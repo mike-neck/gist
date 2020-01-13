@@ -3,9 +3,6 @@ package main
 // GistID is an id of a gist.
 type GistID string
 
-// UserName is owner of gist.
-type UserName string
-
 // PreferSSH determines protocol (https/ssh).
 type PreferSSH int
 
@@ -26,7 +23,6 @@ func PreferSSHFromBool(sshFlag bool) PreferSSH {
 type CloneCommand struct {
 	GistID
 	ProfileName
-	UserName
 }
 
 // Run command of CloneCommand
