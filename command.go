@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Application represents main function of the application.
 type Application interface {
 	Start() error
 }
@@ -63,10 +64,12 @@ func NewEnvValues() EnvValues {
 	}
 }
 
+// DefaultProfileFile returns default value of ProfileFile
 func (ev *EnvValues) DefaultProfileFile() ProfileFile {
 	return ProfileFile(fmt.Sprintf("%s/.gist.yml", ev.UserHome))
 }
 
+// NewContext returns ProfileContext created by the Environmental variables.
 func (ev *EnvValues) NewContext(file ProfileFile) (ProfileContext, error) {
 	profileFile := file
 	if profileFile == "" {

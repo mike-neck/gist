@@ -6,6 +6,7 @@ import (
 	"io"
 )
 
+// NewProfileCommand returns Command for command `profile`.
 func NewProfileCommand(name, token, dir *string) Command {
 	return &AppendOrOverrideProfilesCommand{
 		ProfileName:       ProfileName(*name),
