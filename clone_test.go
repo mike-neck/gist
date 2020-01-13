@@ -90,7 +90,7 @@ func TestCloneCommand_Clone(t *testing.T) {
 	command := CloneCommand{
 		GistID:         "d1b910d36d314b77b057ea66fbb65e81",
 		ProfileName:    "default",
-		PreferSSH:      ssh,
+		PreferSSH:      https,
 		RepositoryName: "gist-example",
 	}
 	err := command.Clone("build/clone/test/gist-example")
