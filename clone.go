@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"gopkg.in/src-d/go-git.v4"
 	"io"
 	"os"
 	"strings"
@@ -95,8 +96,10 @@ func (cc *CloneCommand) Run(ctx ProfileContext) error {
 		}
 	}
 	// determine url
-	url := cc.URL()
-	fmt.Println(url)
+	err = cc.Clone(targetDirectory)
+	if err != nil {
+		return fmt.Errorf("CloneCommand_Run_Clone: %w", err)
+	}
 	// execute git clone
 	// get info on gist
 	// write info into repository file under destination dir
@@ -145,6 +148,18 @@ func createParentDirectory(directory string) error {
 // URL is gist git url
 func (cc *CloneCommand) URL() string {
 	return fmt.Sprintf("%s%s.git", cc.BaseURL(), cc.GistID)
+}
+
+// Clone clones gist repository.
+func (cc *CloneCommand) Clone(directory string) error {
+	url := cc.URL()
+	_, err := git.PlainClone(directory, false, &git.CloneOptions{
+		URL: url,
+	})
+	if err != nil {
+		return fmt.Errorf("GitClone(%s): %w", url, err)
+	}
+	return nil
 }
 
 //git@gist.github.com:0674f0f942295225275c349abbe06675.git

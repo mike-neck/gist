@@ -85,3 +85,30 @@ func TestCloneCommand_URL_SSH(t *testing.T) {
 	url = command.URL()
 	assert.Equal(t, "git@gist.github.com:11aa22bb33cc.git", url)
 }
+
+func TestCloneCommand_Clone(t *testing.T) {
+	command := CloneCommand{
+		GistID:         "d1b910d36d314b77b057ea66fbb65e81",
+		ProfileName:    "default",
+		PreferSSH:      ssh,
+		RepositoryName: "gist-example",
+	}
+	err := command.Clone("build/clone/test/gist-example")
+	assert.Nil(t, err)
+	dir, err := os.Open("build/clone/test/gist-example")
+	assert.Nil(t, err)
+	names, err := dir.Readdirnames(30)
+	assert.Nil(t, err)
+	assert.True(t, 0 <= indexOf("test.go", names), "test.go", names)
+	assert.True(t, 0 <= indexOf("test.md", names), "test.md", names)
+	assert.True(t, 0 <= indexOf(".git", names), "git", names)
+}
+
+func indexOf(item string, items []string) int {
+	for idx, i := range items {
+		if item == i {
+			return idx
+		}
+	}
+	return -1
+}
