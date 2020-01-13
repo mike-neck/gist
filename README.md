@@ -63,13 +63,11 @@ gist clone 0a1b2c3d4e5f
 Profile
 ---
 
-*WIP*
-
 Creates or overrides a profile.
 
 * command - `profile`
 * parameters
-    * `name` - A name of new profile.(If not specified, `default` will be used.)
+    * `profile` - A name of new profile.(If not specified, `default` will be used.)
     * `token` - GitHub access token for the new profile to use.
     * `dir` - Destination directory for the new profile to use.
 

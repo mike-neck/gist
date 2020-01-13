@@ -6,6 +6,14 @@ import (
 	"io"
 )
 
+func NewProfileCommand(name, token, dir *string) Command {
+	return &AppendOrOverrideProfilesCommand{
+		ProfileName:       ProfileName(*name),
+		GitHubAccessToken: GitHubAccessToken(*token),
+		DestinationDir:    DestinationDir(*dir),
+	}
+}
+
 // AppendOrOverrideProfilesCommand represents command profile
 type AppendOrOverrideProfilesCommand struct {
 	ProfileName

@@ -25,7 +25,7 @@ func (file *ProfileFile) NewWriter() (io.WriteCloser, error) {
 			return nil, fmt.Errorf("ProfileFile_NewWriter_MkdirAll(%s): %w", parent, err)
 		}
 	}
-	writer, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0644)
+	writer, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		return nil, fmt.Errorf("ProfileFile_NewWriter_OpenFile: %w", err)
 	}
@@ -121,5 +121,5 @@ func (context *ProfileContext) Dir(profileName ProfileName) (DestinationDir, err
 // Command represents command being executed by user.
 type Command interface {
 	// Run executes each command.
-	Run(ctx *ProfileContext) error
+	Run(ctx ProfileContext) error
 }
