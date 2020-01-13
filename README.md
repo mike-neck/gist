@@ -14,7 +14,7 @@ A user can configure `gist` with `$HOME/.gist.yml` file.
 
 ```yaml
 - profile: default
-  destination_dir: my-gists
+  destination_dir: /users/foo/my-gists
   # GITHUB_ACCESS_TOKEN will be used for the profile "default".
 - profile: privates
   github_access_token: 5f4e3d2c1b0a

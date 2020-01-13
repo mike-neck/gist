@@ -49,7 +49,7 @@ func TestLoadFromReader(t *testing.T) {
 
 	firstExpected := Profile{
 		Name: "default",
-		Dir:  "my-gists",
+		Dir:  "/users/foo/my-gists",
 	}
 	assert.Equal(t, firstExpected, ps[0])
 
@@ -62,7 +62,7 @@ func TestLoadFromReader(t *testing.T) {
 
 var validReader io.Reader = strings.NewReader(`
 - profile: default
-  destination_dir: my-gists
+  destination_dir: /users/foo/my-gists
   # GITHUB_ACCESS_TOKEN will be used for the profile "default".
 - profile: privates
   github_access_token: 5f4e3d2c1b0a
@@ -113,7 +113,7 @@ func TestLoadProfileFromFile(t *testing.T) {
 	}
 	firstExpected := Profile{
 		Name: "default",
-		Dir:  "my-gists",
+		Dir:  "/users/foo/my-gists",
 	}
 	secondExpected := Profile{
 		Name:  "privates",

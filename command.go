@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+type Application interface {
+	Start() error
+}
+
 // ProfileFile is the file of profiles to be loaded.
 type ProfileFile string
 
@@ -57,6 +61,26 @@ func NewEnvValues() EnvValues {
 		GitHubAccessToken: GitHubAccessToken(githubAccessToken),
 		UserHome:          UserHome(userHome),
 	}
+}
+
+func (ev *EnvValues) DefaultProfileFile() ProfileFile {
+	return ProfileFile(fmt.Sprintf("%s/.gist.yml", ev.UserHome))
+}
+
+func (ev *EnvValues) NewContext(file ProfileFile) (ProfileContext, error) {
+	profileFile := file
+	if profileFile == "" {
+		profileFile = ev.DefaultProfileFile()
+	}
+	profiles, err := profileFile.LoadProfiles()
+	if err != nil {
+		return ProfileContext{}, fmt.Errorf("EnvValues_NewContext_LoadProfiles: %w", err)
+	}
+	return ProfileContext{
+		EnvValues:       *ev,
+		ProfileFile:     profileFile,
+		CurrentProfiles: profiles,
+	}, nil
 }
 
 // ProfileContext is Profiles and ProfileFile which the command will be executed on.

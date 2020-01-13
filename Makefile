@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	go build -o build/gist main.go
+	go build -o build/gist -v
 
 .PHONY: test
 test:

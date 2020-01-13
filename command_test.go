@@ -188,3 +188,75 @@ func prepareExistingFile(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestEnvValues_NewContext(t *testing.T) {
+	envValues := EnvValues{
+		GitHubAccessToken: "aa00bb11cc22",
+		UserHome:          "/users/ec2-user",
+	}
+	context, err := envValues.NewContext("")
+	assert.Nil(t, err)
+	expected := ProfileContext{
+		EnvValues:       envValues,
+		ProfileFile:     ProfileFile("/users/ec2-user/.gist.yml"),
+		CurrentProfiles: []Profile{},
+	}
+	assert.Equal(t, expected, context)
+}
+
+func TestEnvValues_NewContext_WithUserSpecProfileFile(t *testing.T) {
+	envValues := EnvValues{
+		GitHubAccessToken: "aa00bb11cc22",
+		UserHome:          "/users/ec2-user",
+	}
+	context, err := envValues.NewContext("testdata/test.yml")
+	assert.Nil(t, err)
+	expected := ProfileContext{
+		EnvValues:       envValues,
+		ProfileFile:     ProfileFile("testdata/test.yml"),
+		CurrentProfiles: []Profile{},
+	}
+	assert.Equal(t, expected, context)
+}
+
+func TestEnvValues_NewContext_WithUserSpecProfileFileWithContents(t *testing.T) {
+	envValues := EnvValues{
+		GitHubAccessToken: "aa00bb11cc22",
+		UserHome:          "/users/ec2-user",
+	}
+	context, err := envValues.NewContext("testdata/profile.yml")
+	assert.Nil(t, err)
+	expected := ProfileContext{
+		EnvValues:   envValues,
+		ProfileFile: ProfileFile("testdata/profile.yml"),
+		CurrentProfiles: []Profile{
+			{
+				Name: "default",
+				Dir:  "/users/foo/my-gists",
+			},
+			{
+				Name:  "privates",
+				Token: "5f4e3d2c1b0a",
+			},
+		},
+	}
+	assert.Equal(t, expected, context)
+}
+
+func TestEnvValues_NewContext_NotExistingProfileFile(t *testing.T) {
+	envValues := EnvValues{
+		GitHubAccessToken: "aa00bb11cc22",
+		UserHome:          "/users/ec2-user",
+	}
+	_, err := envValues.NewContext("testdata/not-exists.yml")
+	assert.Nil(t, err)
+}
+
+func TestEnvValues_NewContext_FileIsDirectory(t *testing.T) {
+	envValues := EnvValues{
+		GitHubAccessToken: "aa00bb11cc22",
+		UserHome:          "/users/ec2-user",
+	}
+	_, err := envValues.NewContext("testdata")
+	assert.NotNil(t, err)
+}
