@@ -8,12 +8,9 @@ import (
 )
 
 func TestNewEnvValues(t *testing.T) {
-	_ = godotenv.Load("testdata/test.env")
-	expected := EnvValues{
-		GitHubAccessToken: "aa00bb11cc22",
-	}
+	_ = godotenv.Load("testdata/github-actions-env.env")
 	envValues := NewEnvValues()
-	assert.Equal(t, expected.GitHubAccessToken, envValues.GitHubAccessToken)
+	assert.True(t, len([]rune(string(envValues.GitHubAccessToken))) > 0)
 	assert.NotEmpty(t, envValues.UserHome)
 }
 
