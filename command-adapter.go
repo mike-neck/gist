@@ -54,42 +54,58 @@ func profileCommand(envValues *EnvValues, fileFlag *string) *cli.Command {
 		Aliases: []string{"p"},
 		Usage:   "add or update profile configuration",
 		Action: func(context *cli.Context) error {
-			ctx, err := envValues.NewContext(ProfileFile(*fileFlag))
-			if err != nil {
-				return fmt.Errorf("ProfileCommand_NewContext: %w", err)
-			}
-			command := NewProfileCommand(&name, &token, &dir)
-			err = command.Run(ctx)
-			if err != nil {
-				return fmt.Errorf("ProfileCommandAction: %w", err)
-			}
-			return nil
+			return profileCommandAction(envValues, *fileFlag, name, token, dir)
 		},
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "profile",
-				Aliases:     []string{"p"},
-				Usage:       "A name of profile",
-				Required:    false,
-				Value:       "default",
-				Destination: &name,
-			},
-			&cli.StringFlag{
-				Name:        "token",
-				Aliases:     []string{"t"},
-				Usage:       "GitHub Access Token for this profile",
-				Required:    false,
-				DefaultText: "",
-				Destination: &token,
-			},
-			&cli.StringFlag{
-				Name:        "dir",
-				Aliases:     []string{"d"},
-				Usage:       "Destination directory for this profile",
-				Required:    false,
-				Value:       "",
-				Destination: &dir,
-			},
+			profileFlag(&name),
+			tokenFlag(&token),
+			destinationDirectoryFlag(&dir),
 		},
+	}
+}
+
+func profileCommandAction(envValues *EnvValues, fileFlag string, name string, token string, dir string) error {
+	ctx, err := envValues.NewContext(ProfileFile(fileFlag))
+	if err != nil {
+		return fmt.Errorf("ProfileCommand_NewContext: %w", err)
+	}
+	command := NewProfileCommand(&name, &token, &dir)
+	err = command.Run(ctx)
+	if err != nil {
+		return fmt.Errorf("ProfileCommandAction: %w", err)
+	}
+	return nil
+}
+
+func profileFlag(name *string) *cli.StringFlag {
+	return &cli.StringFlag{
+		Name:        "profile",
+		Aliases:     []string{"p"},
+		Usage:       "A name of profile",
+		Required:    false,
+		Value:       "default",
+		Destination: name,
+	}
+}
+
+func tokenFlag(token *string) *cli.StringFlag {
+	return &cli.StringFlag{
+		Name:        "token",
+		Aliases:     []string{"t"},
+		Usage:       "GitHub Access Token for this profile",
+		Required:    false,
+		DefaultText: "",
+		Destination: token,
+	}
+}
+
+func destinationDirectoryFlag(dir *string) *cli.StringFlag {
+	return &cli.StringFlag{
+		Name:        "dir",
+		Aliases:     []string{"d"},
+		Usage:       "Destination directory for this profile",
+		Required:    false,
+		Value:       "",
+		Destination: dir,
 	}
 }
