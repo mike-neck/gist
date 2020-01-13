@@ -83,6 +83,22 @@ func (cc *CloneCommand) Run(ctx ProfileContext) error {
 	}
 	fmt.Println(targetDirectory)
 	// test directory is empty or not existing
+	err = prepareDirectory(targetDirectory)
+	if err != nil {
+		return err
+	}
+	// determine url
+	err = cc.Clone(targetDirectory)
+	if err != nil {
+		return fmt.Errorf("CloneCommand_Run_Clone: %w", err)
+	}
+	// execute git clone
+	// get info on gist
+	// write info into repository file under destination dir
+	return nil
+}
+
+func prepareDirectory(targetDirectory string) error {
 	result, err := testDestinationDir(targetDirectory)
 	if err != nil {
 		return fmt.Errorf("CloneCommand_Run_TestDir: %w", err)
@@ -95,14 +111,6 @@ func (cc *CloneCommand) Run(ctx ProfileContext) error {
 			return fmt.Errorf("CloneCommand_Run_CreateParentDir(%s): %w", targetDirectory, err)
 		}
 	}
-	// determine url
-	err = cc.Clone(targetDirectory)
-	if err != nil {
-		return fmt.Errorf("CloneCommand_Run_Clone: %w", err)
-	}
-	// execute git clone
-	// get info on gist
-	// write info into repository file under destination dir
 	return nil
 }
 
