@@ -4,10 +4,15 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"os"
+	"runtime"
 	"testing"
 )
 
 func TestNewEnvValues(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skipf("skip test because godotenv seems that it is unable to read dynamic env file.")
+		return
+	}
 	_ = godotenv.Load("testdata/github-actions-env.env")
 	envValues := NewEnvValues()
 	assert.True(t, len([]rune(string(envValues.GitHubAccessToken))) > 0)

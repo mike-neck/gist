@@ -99,12 +99,11 @@ func (cc *CloneCommand) Run(ctx ProfileContext) error {
 	if err != nil {
 		return err
 	}
-	// determine url
+	// execute git clone
 	err = cc.Clone(targetDirectory)
 	if err != nil {
 		return fmt.Errorf("CloneCommand_Run_Clone: %w", err)
 	}
-	// execute git clone
 	// get info on gist
 	// write info into repository file under destination dir
 	return nil
