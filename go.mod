@@ -1,4 +1,4 @@
-module gist
+module github.com/mike-neck/gist
 
 go 1.13
 
