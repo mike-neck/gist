@@ -4,142 +4,18 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"os"
+	"runtime"
 	"testing"
 )
 
-func TestProfileContext_Token(t *testing.T) {
-	context := ProfileContext{
-		ProfileFile: "test.yml",
-		CurrentProfiles: []Profile{
-			{
-				Name: "default",
-				Dir:  "/user/name/gists",
-			},
-			{
-				Name:  "privates",
-				Token: "a0b1c2d3e4f5",
-			},
-		},
-	}
-	profileName := ProfileName("privates")
-	var githubAccessToken GitHubAccessToken
-	githubAccessToken, err := context.Token(profileName)
-	assert.Nil(t, err)
-	assert.Equal(t, GitHubAccessToken("a0b1c2d3e4f5"), githubAccessToken)
-}
-
-func TestProfileContext_Token_failure(t *testing.T) {
-	context := ProfileContext{
-		ProfileFile: "test.yml",
-		CurrentProfiles: []Profile{
-			{
-				Name: "default",
-				Dir:  "/user/name/gists",
-			},
-			{
-				Name:  "privates",
-				Token: "a0b1c2d3e4f5",
-			},
-		},
-	}
-	profileName := ProfileName("app")
-	_, err := context.Token(profileName)
-	assert.NotNil(t, err)
-}
-
-func TestProfileContext_Token_From_Env(t *testing.T) {
-	context := ProfileContext{
-		EnvValues: EnvValues{
-			GitHubAccessToken: "aa00bb11cc22",
-		},
-		ProfileFile: "test.yml",
-		CurrentProfiles: []Profile{
-			{
-				Name: "default",
-				Dir:  "/user/name/gists",
-			},
-			{
-				Name:  "privates",
-				Token: "a0b1c2d3e4f5",
-			},
-		},
-	}
-	profileName := ProfileName("default")
-	githubAccessToken, err := context.Token(profileName)
-	assert.Nil(t, err)
-	assert.Equal(t, GitHubAccessToken("aa00bb11cc22"), githubAccessToken)
-}
-
-func TestProfileContext_Dir(t *testing.T) {
-	context := ProfileContext{
-		ProfileFile: "test.yml",
-		CurrentProfiles: []Profile{
-			{
-				Name: "default",
-				Dir:  "/user/name/gists",
-			},
-			{
-				Name:  "privates",
-				Token: "a0b1c2d3e4f5",
-			},
-		},
-	}
-	profileName := ProfileName("default")
-	var destinationDir DestinationDir
-	destinationDir, err := context.Dir(profileName)
-	assert.Nil(t, err)
-	assert.Equal(t, DestinationDir("/user/name/gists"), destinationDir)
-}
-
-func TestProfileContext_Dir_failure(t *testing.T) {
-	context := ProfileContext{
-		ProfileFile: "test.yml",
-		CurrentProfiles: []Profile{
-			{
-				Name: "default",
-				Dir:  "/user/name/gists",
-			},
-			{
-				Name:  "privates",
-				Token: "a0b1c2d3e4f5",
-			},
-		},
-	}
-	profileName := ProfileName("app")
-	_, err := context.Dir(profileName)
-	assert.NotNil(t, err)
-}
-
-func TestProfileContext_Dir_From_Env(t *testing.T) {
-	context := ProfileContext{
-		EnvValues: EnvValues{
-			UserHome: "/users/ec2-user",
-		},
-		ProfileFile: "test.yml",
-		CurrentProfiles: []Profile{
-			{
-				Name: "default",
-				Dir:  "/user/name/gists",
-			},
-			{
-				Name:  "privates",
-				Token: "a0b1c2d3e4f5",
-			},
-		},
-	}
-	profileName := ProfileName("privates")
-	destinationDir, err := context.Dir(profileName)
-	assert.Nil(t, err)
-	assert.Equal(t, DestinationDir("/users/ec2-user/gist/privates"), destinationDir)
-}
-
 func TestNewEnvValues(t *testing.T) {
-	_ = godotenv.Load("testdata/test.env")
-	expected := EnvValues{
-		GitHubAccessToken: "aa00bb11cc22",
+	if runtime.GOOS == "windows" {
+		t.Skipf("skip test because godotenv seems that it is unable to read dynamic env file.")
+		return
 	}
+	_ = godotenv.Load("testdata/github-actions-env.env")
 	envValues := NewEnvValues()
-	assert.Equal(t, expected.GitHubAccessToken, envValues.GitHubAccessToken)
+	assert.True(t, len([]rune(string(envValues.GitHubAccessToken))) > 0)
 	assert.NotEmpty(t, envValues.UserHome)
 }
 
@@ -258,5 +134,33 @@ func TestEnvValues_NewContext_FileIsDirectory(t *testing.T) {
 		UserHome:          "/users/ec2-user",
 	}
 	_, err := envValues.NewContext("testdata")
+	assert.NotNil(t, err)
+}
+
+func TestDestinationDir_Resolve(t *testing.T) {
+	destinationDir := DestinationDir("build")
+	var dir string
+	dir, err := destinationDir.Resolve("sub")
+	assert.Nil(t, err)
+	assert.Equal(t, "build/sub", dir)
+}
+
+func TestDestinationDir_Resolve_WithSuffixSlush(t *testing.T) {
+	destinationDir := DestinationDir("build/")
+	dir, err := destinationDir.Resolve("sub")
+	assert.Nil(t, err)
+	assert.Equal(t, "build/sub", dir)
+}
+
+func TestDestinationDir_Resolve_WithPrefixOnParam(t *testing.T) {
+	destinationDir := DestinationDir("build")
+	dir, err := destinationDir.Resolve("/sub")
+	assert.Nil(t, err)
+	assert.Equal(t, "build/sub", dir)
+}
+
+func TestDestinationDir_Resolve_ParamEmpty(t *testing.T) {
+	destinationDir := DestinationDir("build")
+	_, err := destinationDir.Resolve("")
 	assert.NotNil(t, err)
 }

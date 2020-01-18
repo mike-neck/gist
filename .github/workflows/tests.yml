@@ -24,5 +24,9 @@ jobs:
           GO111MODULE=off GOBIN=$(pwd)/bin go get golang.org/x/lint/golint
           bin/golint -set_exit_status ./...
         if: "matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'"
+      - name: Prepare test
+        env:
+          TOKEN: ${{ secrets.GITHUB_TEST_TOKEN }}
+        run: echo "GITHUB_ACCESS_TOKEN=$TOKEN" > testdata/github-actions-env.env
       - name: Run Tests
         run: make test
