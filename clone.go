@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gopkg.in/src-d/go-git.v4"
 	"io"
+	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -81,6 +82,11 @@ func (cc *CloneCommand) DirName() string {
 	return string(cc.RepositoryName)
 }
 
+// NameIsID returns whether ID is used as name.
+func (cc *CloneCommand) NameIsID() bool {
+	return cc.RepositoryName == ""
+}
+
 // Run command of CloneCommand
 func (cc *CloneCommand) Run(ctx ProfileContext) error {
 	// determine destination dir
@@ -105,7 +111,27 @@ func (cc *CloneCommand) Run(ctx ProfileContext) error {
 		return fmt.Errorf("CloneCommand_Run_Clone: %w", err)
 	}
 	// get info on gist
+	gitHub := ctx.NewGitHub()
+	gist, err := gitHub.GetGist(cc.GistID, cc.ProfileName)
+	if err != nil {
+		log.Printf("clone %s Success, but failed to retreive metadata\n", cc.URL())
+		return fmt.Errorf("CloneCommand_GitHub_Metadata: %w", err)
+	}
 	// write info into repository file under destination dir
+	metadataFile, err := destinationDir.Resolve(".gist")
+	if err != nil {
+		log.Printf("clone %s Success, but failed to retreive metadata\n", cc.URL())
+		return fmt.Errorf("CloneCommand_GitHub_MetadataFile: %w", err)
+	}
+	metadata, err := NewMetadataFromGist(cc.RepositoryName, *gist)
+	if err != nil {
+		log.Printf("clone %s Success, but failed to parse metadata(%v)\n", cc.URL(), err)
+		return fmt.Errorf("CloneCommand_GitHub_CreateMetadata: %w", err)
+	}
+	err = metadata.AppendTo(metadataFile)
+	if err != nil {
+		return fmt.Errorf("CloneCommand_GitHub_WriteMetadata: %w", err)
+	}
 	return nil
 }
 

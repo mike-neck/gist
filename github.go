@@ -15,6 +15,7 @@ type GitHub interface {
 // Gist represents gist API response, some of them are omitted.
 type Gist struct {
 	URL         string     `json:"url"`
+	GitURL      string     `json:"git_pull_url"`
 	ID          string     `json:"id"`
 	Description string     `json:"description"`
 	CreatedAt   string     `json:"created_at"`
